@@ -1,11 +1,13 @@
 #######################
-pyFirebirdSQL Changelog
+PyFirebirdSQL Changelog
 #######################
 
-Version 0.6.3
+Version 0.6.5
 =============
 
 New Features
 ------------
 
+   - callproc() is implemented.
 
+   - document is prepared.

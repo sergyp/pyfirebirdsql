@@ -27,7 +27,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="top" title="pyFirebirdSQL 0.6.3 documentation" href="index.html" />
     <link rel="next" title="Python Database API Specification 2.0" href="Python-DB-API-2.0.html" />
-    <link rel="prev" title="pyFirebirdSQL Installation Guide" href="installation.html" /> 
+    <link rel="prev" title="PyFirebirdSQL Installation Guide" href="installation.html" /> 
   </head>
   <body>
     <div class="related">
@@ -43,7 +43,7 @@
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="pyFirebirdSQL Installation Guide"
+          <a href="installation.html" title="PyFirebirdSQL Installation Guide"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">pyFirebirdSQL 0.6.3 documentation</a> &raquo;</li> 
       </ul>
@@ -57,10 +57,10 @@
   <div class="section" id="quick-start-guide-tutorial">
 <h1>Quick-start Guide / Tutorial<a class="headerlink" href="#quick-start-guide-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This brief tutorial aims to get the reader started by demonstrating
-elementary usage of pyFirebirdSQL. It is not a comprehensive Python
+elementary usage of PyFirebirdSQL. It is not a comprehensive Python
 Database API tutorial, nor is it comprehensive in its coverage of
 anything else.</p>
-<p>The numerous advanced features of pyFirebirdSQL are covered in another
+<p>The numerous advanced features of PyFirebirdSQL are covered in another
 section of this documentation, which is not in a tutorial format, though it
 is replete with examples.</p>
 <div class="section" id="connecting-to-a-database">
@@ -87,7 +87,6 @@ UTF-8 as the character set of the connection:</p>
 <span class="n">con</span> <span class="o">=</span> <span class="n">firebirdsql</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
     <span class="n">dsn</span><span class="o">=</span><span class="s">&#39;bison:/temp/test.fdb&#39;</span><span class="p">,</span>
     <span class="n">user</span><span class="o">=</span><span class="s">&#39;sysdba&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;pass&#39;</span><span class="p">,</span>
-    <span class="n">dialect</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c"># necessary for all dialect 1 databases</span>
     <span class="n">charset</span><span class="o">=</span><span class="s">&#39;UTF8&#39;</span> <span class="c"># specify a character set for the connection</span>
   <span class="p">)</span>
 </pre></div>
@@ -247,7 +246,7 @@ but <em>client-side</em> SQL code (and C API code) must. A result set is
 retrieved from a stored procedure by <cite>SELECT`ing from the procedure,
 whereas output parameters are retrieved with an `EXECUTE PROCEDURE</cite>
 statement.</p>
-<p>To <em>retrieve a result set</em> from a stored procedure with pyFirebirdSQL,
+<p>To <em>retrieve a result set</em> from a stored procedure with PyFirebirdSQL,
 use code such as this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select output1, output2 from the_proc(?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">input2</span><span class="p">))</span>
 
@@ -258,8 +257,6 @@ use code such as this:</p>
 <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c"># If the procedure had any side effects, commit them.</span>
 </pre></div>
 </div>
-<div class="section" id="this-bellow-is-not-implemented-yet">
-<h3>This bellow is not implemented yet<a class="headerlink" href="#this-bellow-is-not-implemented-yet" title="Permalink to this headline">¶</a></h3>
 <p>To <em>execute</em> a stored procedure and <em>access its output parameters</em>,
 use code such as this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">cur</span><span class="o">.</span><span class="n">callproc</span><span class="p">(</span><span class="s">&quot;the_proc&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">input2</span><span class="p">))</span>
@@ -277,7 +274,6 @@ procedure&#8217;s output parameters as the return value of
 current behavior, however.</p>
 </div>
 </div>
-</div>
 
 
           </div>
@@ -290,17 +286,14 @@ current behavior, however.</p>
 <li><a class="reference internal" href="#">Quick-start Guide / Tutorial</a><ul>
 <li><a class="reference internal" href="#connecting-to-a-database">Connecting to a Database</a></li>
 <li><a class="reference internal" href="#executing-sql-statements">Executing SQL Statements</a></li>
-<li><a class="reference internal" href="#calling-stored-procedures">Calling Stored Procedures</a><ul>
-<li><a class="reference internal" href="#this-bellow-is-not-implemented-yet">This bellow is not implemented yet</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#calling-stored-procedures">Calling Stored Procedures</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="installation.html"
-                        title="previous chapter">pyFirebirdSQL Installation Guide</a></p>
+                        title="previous chapter">PyFirebirdSQL Installation Guide</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="Python-DB-API-2.0.html"
                         title="next chapter">Python Database API Specification 2.0</a></p>
@@ -339,7 +332,7 @@ current behavior, however.</p>
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              >next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="pyFirebirdSQL Installation Guide"
+          <a href="installation.html" title="PyFirebirdSQL Installation Guide"
              >previous</a> |</li>
         <li><a href="index.html">pyFirebirdSQL 0.6.3 documentation</a> &raquo;</li> 
       </ul>

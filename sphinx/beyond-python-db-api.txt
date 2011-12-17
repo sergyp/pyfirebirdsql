@@ -22,10 +22,10 @@ such as temporary sort files, and it may even have dependent shadow
 databases. Although the database engine recognizes a `DROP DATABASE`
 SQL statement, support for that statement is limited to the `isql`
 command-line administration utility. However, the engine supports the
-deletion of databases via an API call, which pyFirebirdSQL exposes to
+deletion of databases via an API call, which PyFirebirdSQL exposes to
 Python (see below).
 
-pyFirebirdSQL supports dynamic database creation and deletion via the
+PyFirebirdSQL supports dynamic database creation and deletion via the
 module-level function :func:`firebirdsql.create_database` and the method
 :meth:`~firebirdsql.Connection.drop_database`. These are documented below,
 then demonstrated by a brief example.
@@ -39,8 +39,6 @@ then demonstrated by a brief example.
 
    :sql:     string containing the `CREATE DATABASE` statement. Note that
              this statement may need to include a username and password.
-   :dialect: `optional` - the SQL dialect under which to execute the
-             statement (defaults to `3`).
 
 .. method:: Connection.drop_database()
 
@@ -72,7 +70,7 @@ then demonstrated by a brief example.
 Advanced Transaction Control
 ============================
 
-For the sake of simplicity, pyFirebirdSQL lets the Python programmer
+For the sake of simplicity, PyFirebirdSQL lets the Python programmer
 ignore transaction management to the greatest extent allowed by the
 Python Database API Specification 2.0. The specification says, "if the
 database supports an auto-commit feature, this must be initially off".
@@ -86,12 +84,12 @@ Remember that because of `ACID
 every data manipulation operation in the Firebird database engine
 takes place in the context of a transaction, including operations
 that are conceptually "read-only", such as a typical `SELECT`.
-The client programmer of pyFirebirdSQL establishes a transaction
+The client programmer of PyFirebirdSQL establishes a transaction
 implicitly by using any SQL execution method, such as 
 :meth:`~Connection.execute_immediate()`,
 :meth:`Cursor.execute()`, or :meth:`Cursor.callproc()`.
 
-Although pyFirebirdSQL allows the programmer to pay little attention to
+Although PyFirebirdSQL allows the programmer to pay little attention to
 transactions, it also exposes the full complement of the database
 engine's advanced transaction control features: transaction
 parameters, retaining transactions, savepoints, and distributed
@@ -101,7 +99,7 @@ Explicit transaction start
 --------------------------
 
 In addition to the implicit transaction initiation required by
-Python Database API, pyFirebirdSQL allows the programmer to
+Python Database API, PyFirebirdSQL allows the programmer to
 start transactions explicitly via the `Connection.begin` method.
 
 .. method:: Connection.begin(tpb)
@@ -135,10 +133,10 @@ that single transaction.
 For details about TPB construction, see the Firebird API documentation.
 In particular, the :file:`ibase.h` supplied with Firebird contains all
 possible TPB elements -- single bytes that the C API defines as
-constants whose names begin with `isc_tpb_`. pyFirebirdSQL makes all of
+constants whose names begin with `isc_tpb_`. PyFirebirdSQL makes all of
 those TPB constants available (under the same names) as module-level
 constants in the form of single-character strings. A transaction
-parameter *buffer* is handled in C as a character array; pyFirebirdSQL
+parameter *buffer* is handled in C as a character array; PyFirebirdSQL
 requires that TPBs be constructed as Python strings. Since the
 constants in the `firebirdsql.isc_tpb_*` family are single-character
 Python strings, they can simply be concatenated to create a TPB.
@@ -183,7 +181,7 @@ access to the database:
     con.commit()
 
 
-For convenient and safe construction of custom `tpb_block`, pyFirebirdSQL provides
+For convenient and safe construction of custom `tpb_block`, PyFirebirdSQL provides
 special utility class `TPB`.
 
 .. class:: TPB
@@ -336,7 +334,7 @@ providing "multi-level undo" functionality.
 
 Although Firebird savepoints are fully supported from SQL alone via
 the `SAVEPOINT 'name'` and `ROLLBACK TO 'name'` statements,
-pyFirebirdSQL also exposes savepoints at the Python API level for the
+PyFirebirdSQL also exposes savepoints at the Python API level for the
 sake of convenience. 
 
 .. method::  Connection.savepoint(name)
@@ -350,7 +348,7 @@ sake of convenience.
    Database API Specification.
 
 The following program demonstrates savepoint manipulation via the
-pyFirebirdSQL API, rather than raw SQL.
+PyFirebirdSQL API, rather than raw SQL.
 
 .. sourcecode:: python
 
@@ -426,7 +424,7 @@ transaction openned simultaneously to perform various tasks, which
 would require to open multiple connections and thus consume more
 resources than necessary.
 
-pyFirebirdSQL surfaces this Firebird feature through new class
+PyFirebirdSQL surfaces this Firebird feature through new class
 :class:`Transaction` and extensions to 
 :class:`~firebirdsql.Connection` and :class:`~firebirdsql.Cursor`
 classes.
@@ -576,129 +574,6 @@ To use additional transactions, create new :class:`~firebirdsql.Transaction` obj
 calling :meth:`Connection.trans()` method.
 
 
-Distributed Transactions
-------------------------
-
-Distributed transactions are transactions that span multiple databases. pyFirebirdSQL
-provides this Firebird feature through `ConnectionGroup` class.
-
-.. class:: ConnectionGroup
-
-   .. method:: __init__(connections=())
-
-      Constructor accepts optional list of database connections.
-      Connections cannot be in closed state.
-
-   .. method:: disband()
-
-      Forcefully deletes all connections from connection group.
-      If transaction is active, it's canceled (rollback).
-
-   .. method:: add(con)
-
-      Adds active connection to the group. If connection altready
-      belong to this or any other ConnectionGroup, has active
-      transaction, or timeout for it is defined, an exception
-      is raised. Group also cannot accept new members when in
-      unresolved transactions.
-
-   .. method:: remove(con)
-
-      Removes specified connection from group. Raises an exception
-      if connection doesn't belong to this group or if group has
-      unresolved transaction.
-
-   .. method:: clear()
-
-      Removes all connections from group. Raises an exception
-      if group has unresolved transaction.
-
-   .. method:: members()
-
-      Returns list of connection objects that belong to this group.
-
-   .. method:: count()
-
-      Returns number of connection objects that belong to this group.
-
-   .. method:: contains(con)
-
-      Returns True if specified connection belong to this group.
-
-   .. method:: begin()
-
-      Starts distributed transaction over member connections.
-
-   .. method:: commit(retaining=False)
-
-      Commits distributed transaction over member connections using 2PC.
-
-   .. method:: prepare()
-
-      Manually triggers the first phase of a two-phase commit (2PC).  Use
-      of this method is optional; if preparation is not triggered manually,
-      it will be performed implicitly by commit() in a 2PC.
-
-   .. method:: rollback(retaining=False)
-
-      Rollbacks distributed transaction over member connections.
-
-.. note::  While a `Connection` belongs to a `ConnectionGroup`, any calls
-           to the connection's transactional methods ( `begin`, `prepare`,
-           `commit`, `rollback`) will "bubble upward" to apply to the distributed
-           transaction shared by the group as a whole.
-
-
-.. rubric:: Pitfalls and Limitations
-
-+ Never add more than one connection to the same database to the same
-  `ConnectionGroup`!
-
-+ Current implementation works only with connection objects and their main
-  transactions. Secondary transaction objects obrained from connection cannot
-  participate in distributed transaction.
-
-
-**Example:**
-
-.. sourcecode:: python
-
-    import firebirdsql
-
-    # Establish multiple connections the usual way:
-    con1 = firebirdsql.connect(dsn='weasel:/temp/test.db', user='sysdba', password='pass')
-    con2 = firebirdsql.connect(dsn='coyote:/temp/test.db', user='sysdba', password='pass')
-
-    # Create a ConnectionGroup to associate multiple connections in such a
-    # way that they can participate in a distributed transaction.
-    # !!!
-    # NO TWO MEMBERS OF A SINGLE CONNECTIONGROUP SHOULD BE ATTACHED TO THE SAME DATABASE!
-    # !!!
-    group = firebirdsql.ConnectionGroup( connections=(con1,con2) )
-
-    # Start a distributed transaction involving all of the members of the group
-    # (con1 and con2 in this case) with one of the following approaches:
-    #   - Call  group.begin()
-    #   - Call  con1.begin(); the operation will "bubble upward" and apply to the group.
-    #   - Call  con2.begin(); the operation will "bubble upward" and apply to the group.
-    #   - Just start executing some SQL statements on either con1 or con2.
-    #     A transaction will be started implicitly; it will be a distributed
-    #     transaction because con1 and con2 are members of a ConnectionGroup.
-    group.begin()
-
-    # Perform some database changes the usual way (via cursors on con1 and con2):
-    ...
-
-    # Commit or roll back the distributed transaction by calling the commit
-    # or rollback method of the ConnectionGroup itself, or the commit or
-    # rollback method of any member connection (con1 or con2 in this case).
-    group.commit()
-
-    # Unless you want to perform another distributed transaction, disband the
-    # group so that member connections can operate independently again.
-    group.clear()
-
-
 Prepared Statements
 ===================
 
@@ -745,9 +620,9 @@ and passing it to the database engine for parsing:
 
 
 Only the values change as each row is inserted; the statement remains
-the same. For many years, pyFirebirdSQL has recognized situations
+the same. For many years, PyFirebirdSQL has recognized situations
 similar to this one and automatically reused the same prepared
-statement in each :meth:`Cursor.execute` call. In pyFirebirdSQL 3.2, the
+statement in each :meth:`Cursor.execute` call. In PyFirebirdSQL 3.2, the
 scheme for automatically reusing prepared statements has become more
 sophisticated, and the API has been extended to offer the client
 programmer manual control over prepared statement creation and use.
@@ -836,7 +711,7 @@ then submits it to :meth:`Cursor.executemany` for execution:
 
 The following program demonstrates the explicit use of
 PreparedStatements. It also benchmarks explicit `PreparedStatement`
-reuse against pyFirebirdSQL's automatic `PreparedStatement` reuse, and
+reuse against PyFirebirdSQL's automatic `PreparedStatement` reuse, and
 against an input strategy that prevents `PreparedStatement` reuse.
 
 .. sourcecode:: python
@@ -883,7 +758,7 @@ against an input strategy that prevents `PreparedStatement` reuse.
 
     iStart += N
 
-    # pyFirebirdSQL automatically uses a PreparedStatement "under the hood":
+    # PyFirebirdSQL automatically uses a PreparedStatement "under the hood":
     startTime = time.time()
     for i in xrange(iStart, iStart + N):
         cur.execute("insert into t (a,b) values (?,?)", (i, str(i)))
@@ -896,7 +771,7 @@ against an input strategy that prevents `PreparedStatement` reuse.
     iStart += N
 
     # A new SQL string containing the inputs is submitted every time, so
-    # pyFirebirdSQL is not able to implicitly reuse a PreparedStatement.  Also, in a
+    # PyFirebirdSQL is not able to implicitly reuse a PreparedStatement.  Also, in a
     # more complicated scenario where the end user supplied the string input
     # values, the program would risk SQL injection attacks:
     startTime = time.time()
@@ -964,7 +839,7 @@ a real application, SQL statements are likely to be far more
 complicated, so the speed advantage of using prepared statements would
 only increase.
 
-As the timings indicate, pyFirebirdSQL does a good job of reusing
+As the timings indicate, PyFirebirdSQL does a good job of reusing
 prepared statements even if the client program is written in a style
 strictly compatible with the Python DB API 2.0 (which accepts only
 strings -- not :class:`PreparedStatement` objects -- to the :meth:`Cursor.execute()`
@@ -976,7 +851,7 @@ Named Cursors
 =============
 
 To allow the Python programmer to perform scrolling `UPDATE` or
-`DELETE` via the "`SELECT ... FOR UPDATE`" syntax, pyFirebirdSQL
+`DELETE` via the "`SELECT ... FOR UPDATE`" syntax, PyFirebirdSQL
 provides the read/write property `Cursor.name`.
 
 .. attribute:: Cursor.name
@@ -1009,7 +884,7 @@ provides the read/write property `Cursor.name`.
 Parameter Conversion
 ====================
 
-pyFirebirdSQL converts bound parameters marked with a `?` in SQL code in
+PyFirebirdSQL converts bound parameters marked with a `?` in SQL code in
 a standard way. However, the module also offers several extensions to
 standard parameter binding, intended to make client code more readable
 and more convenient to write.
@@ -1029,7 +904,7 @@ the same applies when `'123'` and `123` are to be inserted into a
 This weak typing model is quite unlike Python's dynamic yet strong
 typing. Although weak typing is regarded with suspicion by most
 experienced Python programmers, the database engine is in certain
-situations so aggressive about its typing model that pyFirebirdSQL
+situations so aggressive about its typing model that PyFirebirdSQL
 must `compromise <http://sourceforge.net/tracker/index.php?func=detail&
 aid=531828&group_id=9913&atid=309913>`__ in order to remain an elegant
 means of programming the database engine.
@@ -1037,7 +912,7 @@ means of programming the database engine.
 An example is the handling of "magic values" for date and time fields.
 The database engine interprets certain string values such as
 `'yesterday'` and `'now'` as having special meaning in a date/time
-context. If pyFirebirdSQL did not accept strings as the values of
+context. If PyFirebirdSQL did not accept strings as the values of
 parameters destined for storage in date/time fields, the resulting
 code would be awkward. Consider the difference between the two Python
 snippets below, which insert a row containing an integer and a
@@ -1060,7 +935,7 @@ timestamp into a table defined with the following DDL statement:
    t = 'now'
    cur.execute( "insert into test_table (i, t) values (?, ?)", (i, t) )
 
-If pyFirebirdSQL did not support weak parameter typing, string
+If PyFirebirdSQL did not support weak parameter typing, string
 parameters that the database engine is to interpret as "magic values"
 would have to be rolled into the SQL statement in a separate operation
 from the binding of the rest of the parameters, as in the first Python
@@ -1068,14 +943,14 @@ snippet above. Implicit conversion of parameter values from strings
 allows the consistency evident in the second snippet, which is both
 more readable and more general.
 
-It should be noted that pyFirebirdSQL does not perform the conversion
+It should be noted that PyFirebirdSQL does not perform the conversion
 from string itself. Instead, it passes that responsibility to the
 database engine by changing the parameter metadata structure
 dynamically at the last moment, then restoring the original state of
 the metadata structure after the database engine has performed the
 conversion.
 
-A secondary benefit is that when one uses pyFirebirdSQL to import large
+A secondary benefit is that when one uses PyFirebirdSQL to import large
 amounts of data from flat files into the database, the incoming values
 need not necessarily be converted to their proper Python types before
 being passed to the database engine. Eliminating this intermediate
@@ -1096,11 +971,11 @@ Python programmer to transparently convert database field values to
 and from their internal representation.
 
 The client programmer can choose to ignore translators altogether, in
-which case pyFirebirdSQL will manage them behind the scenes. Otherwise,
+which case PyFirebirdSQL will manage them behind the scenes. Otherwise,
 the client programmer can use any of several :ref:`standard type translators
-<included-translators>` included with pyFirebirdSQL, register custom
+<included-translators>` included with PyFirebirdSQL, register custom
 translators, or set the translators to `None` to deal directly with
-the pyFirebirdSQL-internal representation of the data type. When
+the PyFirebirdSQL-internal representation of the data type. When
 translators have been registered for a specific SQL data type, Python
 objects on their way into a database field of that type will be passed
 through the input translator before they are presented to the database
@@ -1171,16 +1046,16 @@ such as this:
 
 Notice that although the sample code registered only one type
 translator, there are four listed in the mapping returned by the
-`get_type_trans_in` method. By default, pyFirebirdSQL uses dynamic type
+`get_type_trans_in` method. By default, PyFirebirdSQL uses dynamic type
 translation to implement the conversion of `DATE`, `TIME`,
 `TIMESTAMP`, `NUMERIC`, and `DECIMAL` values. For the source code
-locations of pyFirebirdSQL's reference translators, see the :ref:`table 
+locations of PyFirebirdSQL's reference translators, see the :ref:`table 
 <included-translators>` in the next section.
 
 In the sample above, a translator is registered under the key
 `'FIXED'`, but Firebird has no SQL data type named `FIXED`. The
 following table lists the names of the database engine's SQL data
-types in the left column, and the corresponding pyFirebirdSQL-specific
+types in the left column, and the corresponding PyFirebirdSQL-specific
 key under which client programmers can register translators in the
 right column.
 
@@ -1204,681 +1079,10 @@ TIME                      'TIME'
 TIMESTAMP                 'TIMESTAMP'
 ========================= ===========================================
 
-
-Consequences of the Dynamic Type Translation in pyFirebirdSQL
--------------------------------------------------------------
-
-Dynamic type translation haseliminated pyFirebirdSQL's dependency on
-:class:`mx.DateTime`. Although pyFirebirdSQL will continue to use 
-:class:`mx.DateTime` as its default date/time representation for the
-sake of backward compatibility, dynamic type translation allows users
-to conveniently deal with database date/time values in terms of the new
-standard library module `datetime`, or any other representation they
-care to write translators for.
-
-Dynamic type translation also allows `NUMERIC`/ `DECIMAL` values to be
-transparently represented as :class:`decimal.Decimal` objects rather than
-scaled integers, which is much more convenient. For backward
-compatibility, `NUMERIC`/ `DECIMAL` values are still represented by
-default as Python floats, and the older API based on the
-:attr:`~Connection.precision_mode` attribute is still present. However, all
-of these representations are now implemented "under the hood" via
-dynamic type translation.
-
-Reference implementations of all of the translators discussed above
-are provided with pyFirebirdSQL, in these modules:
-
-.. _included-translators:
-
-**Reference Translators Included with pyFirebirdSQL**
-
-+---------------------+-------------------------------------+---------------------------------------+
-| SQL Type(s)         | Python Type(s)                      | Reference Implementation In Module    |
-+=====================+=====================================+=======================================+
-| NUMERIC/DECIMAL     | float *(imprecise)* (default)       | firebirdsql.typeconv_fixed_stdlib     |
-+                     +-------------------------------------+---------------------------------------+
-|                     | scaled `int` *(precise)*            | firebirdsql.typeconv_fixed_stdlib     |
-+                     +-------------------------------------+---------------------------------------+
-|                     | `fixedpoint.FixedPoint` *(precise)* | firebirdsql.typeconv_fixed_fixedpoint |
-+                     +-------------------------------------+---------------------------------------+
-|                     | `decimal.Decimal` *(precise)*       | firebirdsql.typeconv_fixed_decimal    |
-+---------------------+-------------------------------------+---------------------------------------+
-| DATE/TIME/TIMESTAMP | `mx.DateTime` (default)             | firebirdsql.typeconv_datetime_mx      |
-+                     +-------------------------------------+---------------------------------------+
-|                     | Python 2.4+ `datetime`              | firebirdsql.typeconv_datetime_stdlib  |
-+---------------------+-------------------------------------+---------------------------------------+
-| CHAR/VARCHAR (with  | `unicode`                           | firebirdsql.typeconv_text_unicode     |
-| any character set   |                                     |                                       |
-| except NONE, OCTETS,|                                     |                                       |
-| ASCII)              |                                     |                                       |
-+---------------------+-------------------------------------+---------------------------------------+
-
-.. module:: firebirdsql.typeconv_fixed_stdlib
-   :synopsis: Type conversion: Fixed/Standard Library
-
-.. module:: firebirdsql.typeconv_fixed_fixedpoint
-   :synopsis: Type conversion: Fixed/fixedpoint module (3rd party)
-
-.. module:: firebirdsql.typeconv_fixed_decimal
-   :synopsis: Type conversion: Fixed/Python 2.4+ Standard Library
-
-.. module:: firebirdsql.typeconv_datetime_mx
-   :synopsis: Type conversion: DateTime/eGenix mx.DateTime
-
-.. module:: firebirdsql.typeconv_datetime_stdlib
-   :synopsis: Type conversion: DateTIme/Python 2.4+ Standard Library
-
-.. module:: firebirdsql.typeconv_text_unicode
-   :synopsis: Type conversion: Text/Unicode
-
-.. currentmodule:: firebirdsql
-
-Writing Custom Translators
---------------------------
-
-Below is a table that specifies the required argument and return value
-signatures of input and output converters for the various translator
-keys. Python's native types map perfectly to `'TEXT'`,
-`'TEXT_UNICODE'`, `'BLOB'`, `'INTEGER'`, and `'FLOATING'` types, so in
-those cases the translator signatures are very simple. The signatures
-for `'FIXED'`, `'DATE'`, `'TIME'`, and `'TIMESTAMP'` are not as simple
-because Python (before 2.4) lacks native types to represent these
-values with both precision *and* convenience. pyFirebirdSQL handles
-`'FIXED'` values internally as scaled integers; the date and time
-types as tuples.
-
-pyFirebirdSQL itself uses translators implemented according to the rules
-in the table below; the code for these reference translators can be
-found in the Python modules named `firebirdsql.typeconv_*` (see
-the table in the previous section for details).
-
-Signature Specifications for Translators
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-**Translator Key 'TEXT'**
-  For `CHAR` / `VARCHAR` fields with character sets `NONE`, `OCTETS`, or `ASCII`
-
-*Input Translator Argument / Return Value Signature:*
-  Args: a single Python `str`ing argument (or `None`)
-
-  Returns: a single Python string
-
-*Output Translator Signature:*
-  Same signature as input translator, except that return value is not constrained.
-
-
-**Translator Key 'TEXT_UNICODE'**
-  For `CHAR` / `VARCHAR` fields with charsets  **other** than `NONE`, `OCTETS`, or `ASCII`
-
-*Input Translator Argument / Return Value Signature:*
-  Args: a single Python 2-tuple argument containing a Python `unicode` or `str` object
-  (or `None`) in the first element;  the database character set code in the second
-  element (the  tuple is of the form `(val, dbCharacterSetCode)`). 
-
-  The database character set codes (which are integers) are  defined in
-  RDB$CHARACTER_SETS system table. The module `firebirdsql.typeconv_text_unicode`
-  contains a dictionary named  `DB_TO_PYTHON_ENCODING_MAP` that maps database
-  character set codes to Python codec names.
-
-  For example, the database character set `UNICODE_FSS` has code `3`; 
-  `typeconv_text_unicode.DB_TO_PYTHON_ENCODING_MAP[3]` is `'utf_8'`,
-  the name of a Python codec that can be passed to the `encode` / `decode` methods
-  of `unicode` / `str`.
-
-  Returns: a Python `str` object containing the encoded representation of the incoming
-  value (typically computed via `val.encode`). 
-
-*Output Translator Signature:*
-  Args: a single Python 2-tuple argument containing a Python `str` object (or `None`)
-  in the first element; the database character set code in the second element
-  (the tuple is of the form `(val, dbCharacterSetCode)`). `val` contains the encoded
-  representation of the Unicode string.
-
-  Returns: a Python `unicode` object containing the decoded representation
-  of the outgoing value (typically computed via `val.decode`).
-
-
-**Translator Key 'BLOB'**
-
-*Input Translator Argument / Return Value Signature:*
-  By default, same signature as that of 'TEXT'. A special case was introduced in
-  pyFirebirdSQL 3.2 to allow for :ref:`streaming blob handling <blob-conversion>`.
-
-*Output Translator Signature:*
-  Same signature as input translator, except that return value is not constrained.
-
-
-**Translator Key 'INTEGER'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: a single Python `int` argument (or `None`)
-
-  Returns: a single Python `int` (or `long`, if the number too large to fit in
-  an `int`)
-
-*Output Translator Signature:*
-  Same signature as input translator, except that return value is not constrained.
-
-
-**Translator Key 'FLOATING'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: a single Python `float` argument (or `None`)
-
-  Returns: a single Python `float` 
-
-*Output Translator Signature:*
-  Same signature as input translator, except that return value is not constrained. 
-
-
-**Translator Key 'FIXED'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: a single Python 2-tuple argument containing a scaled Python
-  integer in the first element and the scale factor in the second
-  element (the tuple is of the form `(val, scale)`).
-
-  Returns: a single Python integer, scaled appropriately
-
-*Output Translator Signature:*
-  Same signature as input translator, except that return value is not constrained.
-
-
-**Translator Key 'DATE'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: an instance of the chosen date type (such as Python 2.4+'s `datetime.date`)
-  or `None`
-
-  Returns: a single Python 3-tuple of the form `(year, month, day)`
-
-*Output Translator Signature:*
-  Args: a single Python 3-tuple of the form `(year, month, day)` (or `None` if
-  the database field was `NULL`)
-
-  Return value is not constrained.
-
-
-**Translator Key 'TIME'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: an instance of the chosen time type (such as Python 2.4+'s `datetime.time`)
-  or `None`
-
-  Returns: a single Python 4-tuple of the form `(hour, minute, second, microseconds)`
-
-*Output Translator Signature:*
-  Args: a single Python 4-tuple of the form `(hour, minute, second, microseconds)`
-  (or `None` if the database field was `NULL`).
-
-  Return value is not constrained. 
-
-
-**Translator Key 'TIMESTAMP'**
-
-*Input Translator Argument / Return Value Signature:*
-  Args: an instance of the chosen time type (such as Python 2.4+'s `datetime.datetime`)
-  or `None`
-
-  Returns: a single Python 7-tuple of the form `(year, month, day, hour, minute,
-  second, microseconds)` 
-
-*Output Translator Signature:*
-  Args: a single Python 7-tuple of the form `(year, month, day, hour, minute, second,
-  microseconds)`. (or `None` if the database field was `NULL`).
-
-  Return value is not constrained.
-
-
-Example Programs
-----------------
-
-
-DATE/TIME/TIMESTAMP
-
-.. sourcecode:: python
-
-    import datetime # Python 2.3 standard library module
-
-    import firebirdsql
-    import firebirdsql.typeconv_datetime_stdlib as tc_dt
-
-    def connect(*args, **kwargs):
-        """
-          This wrapper around firebirdsql.connect creates connections that use
-        the datetime module (which entered the standard library in Python 2.3)
-        for both input and output of DATE, TIME, and TIMESTAMP database fields.
-          This wrapper simply registers firebirdsql's official date/time
-        translators for the datetime module, which reside in the
-        firebirdsql.typeconv_datetime_stdlib module.
-          An equivalent set of translators for mx.DateTime (which firebirdsql
-        uses by default for backward compatibility) resides in the
-        firebirdsql.typeconv_datetime_mx module.
-          Note that because cursors inherit their connection's dynamic type
-        translation settings, cursors created upon connections returned by this
-        function will also use the datetime module.
-        """
-        con = firebirdsql.connect(*args, **kwargs)
-
-        con.set_type_trans_in({
-            'DATE':             tc_dt.date_conv_in,
-            'TIME':             tc_dt.time_conv_in,
-            'TIMESTAMP':        tc_dt.timestamp_conv_in,
-            })
-
-        con.set_type_trans_out({
-            'DATE':             tc_dt.date_conv_out,
-            'TIME':             tc_dt.time_conv_out,
-            'TIMESTAMP':        tc_dt.timestamp_conv_out,
-            })
-
-        return con
-
-
-    def _test():
-        con = connect(dsn='localhost:/temp/test.db', user='sysdba', password='pass')
-        cur = con.cursor()
-
-        # Retrieve the current timestamp of the database server.
-        cur.execute("select current_timestamp from rdb$database")
-        curStamp = cur.fetchone()[0]
-        print 'The type of curStamp is', type(curStamp)
-        print 'curStamp is', curStamp
-
-        # Create a test table with a single TIMESTAMP column.
-        con.execute_immediate("recreate table test_stamp (a timestamp)")
-        con.commit()
-
-        # Insert a timestamp into the database, then retrieve it.
-        py23StandardLibTimestamp = datetime.datetime.now()
-        cur.execute("insert into test_stamp values (?)", (py23StandardLibTimestamp,))
-        cur.execute("select * from test_stamp")
-        curStamp = cur.fetchone()[0]
-        print 'The type of curStamp is', type(curStamp)
-        print 'curStamp is', curStamp
-
-
-    if __name__ == '__main__':
-        _test()
-
-
-Sample output:
-
-.. sourcecode:: python
-
-    The type of curStamp is 
-    curStamp is 2003-05-20 03:55:42
-    The type of stamp is 
-    stamp is 2003-05-20 03:55:42
-
-
-Deferred Loading of Dynamic Type Translators
---------------------------------------------
-
-pyFirebirdSQL has existed since 1998, five years before the `datetime` module was
-available in the Python standard library. Therefore, pyFirebirdSQL's default
-representation for date and time values is the `mx.DateTime` module. This representation
-is recommended by the Python DB API 2.0 Specification, and was an entirely sensible
-choice during the many years before the advent of the standard library `datetime` module.
-
-Now that the `datetime` module is available in the standard library, many pyFirebirdSQL
-users prefer it to `mx.DateTime`. For the sake of backward-compatibility, it is
-necessary to continue to use `mx.DateTime` by default, but it's both burdensome and
-wasteful to import `mx.DateTime` in programs that don't use it. To address this
-situation, pyFirebirdSQL's type translation initialization code defers the choice of
-a default set of translators until the :func:`firebirdsql.init()` function is called. A client
-program can explicitly call `firebirdsql.init` to forestall the import of `mx.DateTime`.
-
-.. function:: init(type_conv=200)
-
-   .. versionchanged:: 3.3
-
-   Takes a keyword argument `type_conv`, which controls pyFirebirdSQL's initial choice
-   of type translators. `type_conv` can be either an integer or an object that has all
-   of the attributes named in :data:`firebirdsql.BASELINE_TYPE_TRANSLATION_FACILITIES`
-   (an example of such an object is the module :mod:`firebirdsql.typeconv_backcompat`).
-   If `type_conv` is an integer, it will cause pyFirebirdSQL to use one of the following
-   predefined type translator configurations:
-
-   .. _typeconv-values:
-
-   +--------------------+----------------------------------------------------------------+
-   | `type_conv` code   | Resulting translator configuration                             |
-   +====================+================================================================+
-   | 0                  | Minimal type translators that represent date/time values as    |
-   |                    | tuples and fixed point values as either floats or scaled       |
-   |                    | integers, depending on the value of the deprecated             |
-   |                    | `Connection.precision_mode` attribute.                         |
-   |                    |                                                                |
-   |                    | Unicode values are **not** encoded or decoded automatically.   |
-   |                    |                                                                |
-   |                    | Implemented by the :mod:`firebirdsql.typeconv_naked` module.   |
-   +--------------------+----------------------------------------------------------------+
-   | 1                  | Backward-compatible type translators that represent date/time  |
-   |                    | values via the `mx.DateTime` module and fixed point values as  |
-   |                    | either floats or scaled integers, depending on the value of the|
-   |                    | deprecated `Connection.precision_mode` attribute.              |
-   |                    |                                                                |
-   |                    | Unicode values are **not** encoded or decoded automatically.   |
-   |                    |                                                                |
-   |                    | Implemented by the :mod:`firebirdsql.typeconv_backcompat`      |
-   |                    |                                                                |
-   |                    | This configuration, perfectly mimics the type translation      |
-   |                    | behavior of pyFirebirdSQL 3.0.                                 |
-   +--------------------+----------------------------------------------------------------+
-   | 100                | This translator configuration, which is intended for use with  |
-   |                    | Python 2.4 and later, represents date/time values via the      |
-   |                    | standard library module `datetime` and fixed point values via  |
-   |                    | the third-party `fixedpoint` module.                           |
-   |                    |                                                                |
-   |                    | Unicode values **are** encoded and decoded automatically.      |
-   |                    |                                                                |
-   |                    | Implemented by the :mod:`firebirdsql.typeconv_23plus` module.  |
-   +--------------------+----------------------------------------------------------------+
-   | 200 (the default)  | This translator configuration represents date/time values via  |
-   |                    | the standard library module `datetime` and fixed point values  |
-   |                    | via the `decimal` module. The `decimal` module entered the     |
-   |                    | standard library in Python 2.4, but can also be manually       |
-   |                    | installed in Python 2.3.                                       |
-   |                    |                                                                |
-   |                    | Unicode values **are** encoded and decoded automatically.      |
-   |                    |                                                                |
-   |                    | Implemented by the :mod:`firebirdsql.typeconv_24plus` module.  |
-   +--------------------+----------------------------------------------------------------+
-   | 199                | This translator configuration is exactly like `200`, except    |
-   |                    | that it represents fixed point values as `float` objects in    |
-   |                    | order to avoid the substantial memory overhead of the `decimal`|
-   |                    | module.                                                        |
-   |                    |                                                                |
-   |                    | *It is fundamentally imprecise to represent fixed point values |
-   |                    | in floating point*, so this convenience code is intended       |
-   |                    | *solely* for users who wish to use `datetime` instead          |
-   |                    | of `mx.DateTime`, but don't care about fixed point values and  |
-   |                    | don't want to suffer the memory overhead of the `decimal`      |
-   |                    | module.                                                        |
-   |                    |                                                                |
-   |                    | Implemented by the :mod:`firebirdsql.typeconv_23plus_lowmem`   |
-   +--------------------+----------------------------------------------------------------+
-   | 300 (the ideal for | This translator configuration is identical to 200, but textual |
-   | Firebird 2.1 and   | blobs are handled in the same way as other textual types, so   |
-   | later)             | unicode encoding/decoding is performed automagically. When     |
-   |                    | converting in the input direction, this doesn't work with any  |
-   | New in v3.3        | Firebird version prior to 2.1, because the Firebird API doesn't|
-   |                    | make the blob's character set ID available.                    |
-   +--------------------+----------------------------------------------------------------+
-
-   These integer type conversion codes are defined *solely* for convenience. The same
-   functionality is available via the object variant of `type_conv`, but setting it up
-   is more laborious for typical translator configurations.
-
-   .. warning:: The default `type_conv` value was changed from 1 to 200 in version 3.3 !
-
-.. module:: firebirdsql.typeconv_naked
-   :synopsis: Type conversion: Minimal
-
-.. module:: firebirdsql.typeconv_backcompat
-   :synopsis: Type conversion: Backward-compatible
-
-.. module:: firebirdsql.typeconv_23plus
-   :synopsis: Type conversion: Progressive
-
-.. module:: firebirdsql.typeconv_23plus_lowmem
-   :synopsis: Type conversion: Even More Progressive
-
-.. module:: firebirdsql.typeconv_24plus
-   :synopsis: Even More Progressive
-
-.. currentmodule:: firebirdsql
-
-
-Deferred Loading: Backward Compatibility Issues
------------------------------------------------
-
-The deferred type translator loading scheme introduced in pyFirebirdSQL
-3.1 goes to great lengths to maintain backward compatibility. If the
-client programmer does not call :func:`firebirdsql.init()`, pyFirebirdSQL will
-implicitly initialize itself in a backward-compatible manner (
-`type_conv=1`) the first time one of its public functions is called or
-one of its public classes is instantiated.
-
-The only known backward incompatibility is this: the DB API type
-comparison singleton :data:`~firebirdsql.DATETIME` will not compare equal
-to any type until the `firebirdsql.init()` function has been called (whether
-explicitly or implicitly). After `firebirdsql.init()` has been called,
-`DATETIME` will compare equal to the date, time, and timestamp types
-that were loaded.
-
-This issue should affect hardly any existing pyFirebirdSQL-based programs.
-
-
-Deferred Loading Example
-------------------------
-
-.. sourcecode:: python
-
-    import datetime, decimal, os.path, string, sys
-
-    import firebirdsql
-    firebirdsql.init(type_conv=200)
-    # This program never imports mx.DateTime:
-    assert 'mx' not in sys.modules
-
-    def test():
-        dbFilename = r'D:\temp\test-deferred.firebird'
-        prepareTestDatabase(dbFilename)
-
-        # Connect with character set UNICODE_FSS, to match the default character
-        # set of the test database.
-        con = firebirdsql.connect(dsn=dbFilename,
-            user='sysdba', password='masterkey', charset='UNICODE_FSS'
-          )
-        cur = con.cursor()
-
-        # Create a test table.
-        cur.execute("""
-            create table test (
-              a numeric(18,2),
-              b date,
-              c time,
-              d timestamp,
-              e varchar(50), /* Defaults to character set UNICODE_FSS. */
-              f varchar(50), /* Defaults to character set UNICODE_FSS. */
-              g varchar(50) character set ASCII
-            )
-          """)
-        con.commit()
-
-        # Create an input value for each field in the test table.
-        aIn = decimal.Decimal('4.53')
-
-        # Notice that the DB API date/time constructors in firebirdsql generate
-        # datetime-based objects instead of mx-based objects because of our earlier
-        # call to firebirdsql.init(type_conv=200).
-        bIn = firebirdsql.Date(2004,1,4)
-        assert isinstance(bIn, datetime.date)
-        cIn = firebirdsql.Time(16,27,59)
-        assert isinstance(cIn, datetime.time)
-        dIn = firebirdsql.Timestamp(2004,1,4, 16,27,59)
-        assert isinstance(dIn, datetime.datetime)
-
-        eIn = u'A unicod\u2211 object stored in a Unicode field.'
-        fIn = 'A str object stored in a Unicode field.'
-        gIn = 'A str object stored in an ASCII field.'
-
-        print '-' * 70
-        inputValues = (aIn, bIn, cIn, dIn, eIn, fIn, gIn)
-        reportValues('In', inputValues)
-        cur.execute("insert into test values (?,?,?,?,?,?,?)", inputValues)
-        print '-' * 70
-        cur.execute("select a,b,c,d,e,f,g from test")
-        (aOut, bOut, cOut, dOut, eOut, fOut, gOut) = outputValues = cur.fetchone()
-        reportValues('Out', outputValues)
-        print '-' * 70
-
-        # Notice that all values made the journey to and from the database intact.
-        assert inputValues == outputValues
-
-    def reportValues(direction, values):
-        for (val, c) in zip(values, string.ascii_lowercase[:len(values)]):
-            varName = c + direction
-            print '%s has type %s, value\n  %s' % (varName, type(val), repr(val))
-
-    def prepareTestDatabase(dbFilename):
-        # Delete the test database if an old copy is already present.
-        if os.path.isfile(dbFilename):
-            conOld = firebirdsql.connect(dsn=dbFilename,
-                user='sysdba', password='masterkey'
-              )
-            conOld.drop_database()
-        # Create the test database afresh.
-        firebirdsql.create_database("""
-              create database '%s'
-              user 'sysdba' password 'masterkey'
-              default character set UNICODE_FSS
-            """ % dbFilename
-          )
-
-    if __name__ == '__main__':
-        test()
-
-
-Program output:
-
-.. sourcecode:: python
-
-    ----------------------------------------------------------------------
-    aIn has type , value
-      Decimal("4.53")
-    bIn has type , value
-      datetime.date(2004, 1, 4)
-    cIn has type , value
-      datetime.time(16, 27, 59)
-    dIn has type , value
-      datetime.datetime(2004, 1, 4, 16, 27, 59)
-    eIn has type , value
-      u'A unicod\u2211 object stored in a Unicode field.'
-    fIn has type , value
-      'A str object stored in a Unicode field.'
-    gIn has type , value
-      'A str object stored in an ASCII field.'
-    ----------------------------------------------------------------------
-    aOut has type , value
-      Decimal("4.53")
-    bOut has type , value
-      datetime.date(2004, 1, 4)
-    cOut has type , value
-      datetime.time(16, 27, 59)
-    dOut has type , value
-      datetime.datetime(2004, 1, 4, 16, 27, 59)
-    eOut has type , value
-      u'A unicod\u2211 object stored in a Unicode field.'
-    fOut has type , value
-      u'A str object stored in a Unicode field.'
-    gOut has type , value
-      u'A str object stored in an ASCII field.'
-    ----------------------------------------------------------------------
-
-
-*Notes about Unicode handling in the example above:*
-
-Upon input, the Python `unicode` object `eIn` was transparently
-encoded for storage in database field `TEST.E` (a `VARCHAR` field with
-character set `UNICODE_FSS` (that is, UTF-8)). Upon output, the
-`UNICODE_FSS` value in `TEST.E` was decoded transparently into the
-Python `unicode` object `eOut`.
-
-`TEST.F` accepted a Python `str` object even though it's a Unicode
-field. The output value `fOut` is a Python `unicode` object rather
-than a `str`.
-
-Although `TEST.G` is an `ASCII` field, and the input value `gIn` is a
-`str`, the output value `gOut` is a `unicode` object. This is because
-the connection's charset is `UNICODE_FSS`, and Firebird tries to
-convert every retrieved value to match that character set.
-
-
-
-Positional Dymanic Type Translation
------------------------------------
-
-All forms of dynamic type translation discussed so far have used the
-*type* of the database field as the basis for selecting a translator.
-pyFirebirdSQL 3.2 also allows the client programmer to control
-translator selection on the basis of a field's *position* within a
-`Cursor`. Translator selection based on database field type is called
-" *typal* translation", while selection based on position is called "
-*positional* translation".
-
-Positional translation can be enabled at the `Cursor` level by
-including zero-based integer keys in the dictionary passed to
-`Cursor.set_type_trans[in|out]`. Consider the following example
-program:
-
-.. sourcecode:: python
-
-    import firebirdsql
-
-    con = firebirdsql.connect(dsn=r'D:\temp\test-20.firebird',
-        user='sysdba', password='masterkey'
-      )
-    cur = con.cursor()
-
-    cur.execute("recreate table test(a int, b int, c int, d int, e float)")
-    con.commit()
-
-    cur.execute("insert into test values (?,?,?,?,?)", (1, 2, 3, 4, 5.0))
-
-    cur.execute("select a,b,c,d,e from test")
-    print 'Before translator modifications, output row is:'
-    print ' ', cur.fetchone()
-
-    cur.set_type_trans_out({
-        'INTEGER':  lambda i: i * 10,
-        1:          lambda i: i * 100,
-        3:          lambda i: i * 1000
-      })
-
-    cur.execute("select a,b,c,d,e from test")
-    print 'After translator modifications, output row is:'
-    print ' ', cur.fetchone()
-
-
-Program output:
-
-.. sourcecode:: python
-
-    Before translator modifications, output row is:
-      (1, 2, 3, 4, 5.0)
-    After translator modifications, output row is:
-      (10, 200, 30, 4000, 5.0)
-
-
-The `cur.set_type_trans_out` call in the example program specifies
-that integer values retrieved by `cur` should be multiplied by `10`,
-then overrides that setting for specific columns: the value in the
-second column (position `1`) is multiplied by `100`, while the value
-in the fourth column (position `3`) is multiplied by `1000`.
-
-pyFirebirdSQL uses a cascading method of translator selection, listed
-below in order from highest to lowest precedence:
-
-+ *Positional* translation settings, which can only be activated at
-  the `Cursor` level, take precedence over *typal* translation settings.
-+ `Cursor`-level translation settings take precedence over
-  `Connection`-level settings.
-+ `Connection`-level translation settings take precedence over the
-  module-level defaults.
-+ The module-level defaults are established by the call to
-  :func:`firebirdsql.init()`. If the client programmer does not call
-  :func:`firebirdsql.init()` explicitly, pyFirebirdSQL's internals will do so
-  implicitly.
-
-
 Database Arrays
 ---------------
 
-pyFirebirdSQL converts database arrays *from* Python sequences (except
+PyFirebirdSQL converts database arrays *from* Python sequences (except
 strings) on input; *to* Python lists on output. On input, the Python
 sequence must be nested appropriately if the array field is multi-
 dimensional, and the incoming sequence must not fall short of its
@@ -1953,7 +1157,7 @@ Output:
 Blobs
 -----
 
-pyFirebirdSQL supports the insertion and retrieval of blobs either
+PyFirebirdSQL supports the insertion and retrieval of blobs either
 wholly in memory ("materialized mode") or in chunks ("streaming mode")
 to reduce memory usage when handling large blobs. The default handling
 mode is "materialized"; the "streaming" method is selectable via a
@@ -1967,7 +1171,7 @@ id=1299756&forum_id=30917>`__ automatic Unicode conversion from
 applying to textual blobs in the way it applies to Unicode `CHAR` and
 `VARCHAR` fields in any Firebird version prior to version 2.1.
 
-.. note:: pyFirebirdSQL 3.3 introduces new :ref:`type_conv mode 300
+.. note:: PyFirebirdSQL 3.3 introduces new :ref:`type_conv mode 300
   <typeconv-values>` that enables automatic type conversion for textual
   blobs when you're working with Firebird 2.1 and newer.
 
@@ -1993,7 +1197,7 @@ a :class:`firebirdsql.BlobReader` object.
     a smaller final chunk of `716928` bytes.
 
 Due to the combination of CPython's deterministic finalization with
-careful programming in pyFirebirdSQL's internals, it is not strictly
+careful programming in PyFirebirdSQL's internals, it is not strictly
 necessary to close `BlobReader` instances explicitly. A `BlobReader`
 object will be automatically closed by its `__del__` method when it
 goes out of scope, or when its `Connection` closes, whichever comes
@@ -2122,17 +1326,17 @@ the following snippet:
    ...
 
 The connection created in the example above is *eligible* to be
-automatically closed by pyFirebirdSQL if it remains idle for at least
-120.0 consecutive seconds. pyFirebirdSQL does not guarantee that the
+automatically closed by PyFirebirdSQL if it remains idle for at least
+120.0 consecutive seconds. PyFirebirdSQL does not guarantee that the
 connection will be closed immediately when the specified period has
 elapsed. On a busy system, there might be a considerable delay between
 the moment a connection becomes eligible for timeout and the moment
-pyFirebirdSQL actually closes it. However, the thread that performs
+PyFirebirdSQL actually closes it. However, the thread that performs
 connection timeouts is programmed in such a way that on a lightly
 loaded system, it acts almost instantaneously to take advantage of a
 connection's eligibility for timeout.
 
-After a connection has timed out, pyFirebirdSQL reacts to attempts to
+After a connection has timed out, PyFirebirdSQL reacts to attempts to
 reactivate the severed connection in a manner dependent on the state
 of the connection when it timed out. Consider the following example
 program:
@@ -2188,7 +1392,7 @@ might think.
 First of all, we cannot guarantee much about the example program's
 behavior because there is a race condition between the obvious thread
 that's executing the example code (which we'll call "UserThread" for
-the rest of this section) and the pyFirebirdSQL-internal background
+the rest of this section) and the PyFirebirdSQL-internal background
 thread that actually closes connections that have timed out
 ("TimeoutThread"). If the operating system were to suspend UserThread
 just after the :func:`firebirdsql.connect()` call for more than
@@ -2219,9 +1423,9 @@ User-Supplied Connection Timeout Callbacks
 ------------------------------------------
 
 In the context of a particular client program, it is not possible for
-pyFirebirdSQL to know the best way for TimeoutThread to react when it
+PyFirebirdSQL to know the best way for TimeoutThread to react when it
 encounters a connection that is eligible for timeout, but has an
-unresolved transaction. For this reason, pyFirebirdSQL's connection
+unresolved transaction. For this reason, PyFirebirdSQL's connection
 timeout system offers callbacks that the client programmer can use to
 guide the TimeoutThread's actions, or to log information about
 connection timeout patterns.
@@ -2233,7 +1437,7 @@ The "Before Timeout" Callback
 The client programmer can supply a "before timeout" callback that
 accepts a single dictionary parameter and returns an integer code to
 indicate how the TimeoutThread should proceed when it finds a
-connection eligible for timeout. Within the dictionary, pyFirebirdSQL
+connection eligible for timeout. Within the dictionary, PyFirebirdSQL
 provides the following entries:
 
 :dsn:              The `dsn` parameter that was passed to `firebirdsql.connect`
@@ -2277,9 +1481,9 @@ the following codes:
 
    Directs the TimeoutThread to roll back the connection's unresolved transaction
    (if any), then close the connection. Upon any future attempt to use the
-   connection, pyFirebirdSQL will *attempt* to transparently reconnect to
+   connection, PyFirebirdSQL will *attempt* to transparently reconnect to
    the database and "resume where it left off" insofar as possible. Of
-   course, network problems and the like could prevent pyFirebirdSQL's
+   course, network problems and the like could prevent PyFirebirdSQL's
    *attempt* at transparent resumption from succeeding. Also, highly
    state-dependent objects such as open result sets, 
    :class:`BlobReader`, and :class:`PreparedStatement`
@@ -2291,11 +1495,11 @@ the following codes:
 
    Directs the TimeoutThread to commit the connection's unresolved transaction
    (if any), then close the connection. Upon any future attempt to use the
-   connection, pyFirebirdSQL will *attempt* to transparently reconnect to
+   connection, PyFirebirdSQL will *attempt* to transparently reconnect to
    the database and "resume where it left off" insofar as possible.
 
 
-If the user does not supply a "before timeout" callback, pyFirebirdSQL
+If the user does not supply a "before timeout" callback, PyFirebirdSQL
 considers the timeout transparent only if the connection does not have
 an unresolved transaction.
 
@@ -2318,7 +1522,7 @@ The "After Timeout" Callback
 
 The client programmer can supply an "after timeout" callback that
 accepts a single dictionary parameter. Within that dictionary,
-pyFirebirdSQL currently provides the following entries:
+PyFirebirdSQL currently provides the following entries:
 
 :dsn:          The `dsn` parameter that was passed to :func:`firebirdsql.connect()`
                when the connection was created.
@@ -2329,12 +1533,12 @@ pyFirebirdSQL currently provides the following entries:
                the last client program activity on the connection and the moment
                the TimeoutThread closed the connection.
 
-pyFirebirdSQL only calls the "after timeout" callback after the
+PyFirebirdSQL only calls the "after timeout" callback after the
 connection has actually been closed by the TimeoutThread. If the
 "before timeout" callback returns :data:`CT_VETO` to cancel the
 timeout attempt, the "after timeout" callback will not be called.
 
-pyFirebirdSQL discards the return value of the "after timeout" callback,
+PyFirebirdSQL discards the return value of the "after timeout" callback,
 and ignores any exceptions.
 
 The same caveats that apply to the "before timeout" callback also
@@ -2777,13 +1981,13 @@ How events are exposed to the server and the client process?
 #. Client Process ("Send me a message when an event occurs.")
 
    .. note:: If you don't care about the gory details of event notification,
-             skip to the section that describes pyFirebirdSQL's Python-level
+             skip to the section that describes PyFirebirdSQL's Python-level
              event handling API. 
 
    The Firebird C client library offers two forms of event notification.
    The first form is *synchronous* notification, by way of the function
    :cfunc:`isc_wait_for_event()`. This form is admirably simple for a C programmer
-   to use, but is inappropriate as a basis for pyFirebirdSQL's event support,
+   to use, but is inappropriate as a basis for PyFirebirdSQL's event support,
    chiefly because it's not sophisticated enough to serve as the basis for
    a comfortable Python-level API. The other form of event notification
    offered by the database client library is *asynchronous*, by way of the
@@ -2815,7 +2019,7 @@ How events are exposed to the server and the client process?
 How events are exposed to the Python programmer?
 ------------------------------------------------
 
-The pyFirebirdSQL database event API is comprised of the following: the
+The PyFirebirdSQL database event API is comprised of the following: the
 method `Connection.event_conduit` and the class :class:`EventConduit`.
 
 .. method:: Connection.event_conduit
@@ -2832,7 +2036,7 @@ method `Connection.event_conduit` and the class :class:`EventConduit`.
 
    :event_names: A sequence of string event names The :meth:`EventConduit.wait()`
                  method will block until the occurrence of at least one of the
-                 events named by the strings in `event_names`. pyFirebirdSQL's
+                 events named by the strings in `event_names`. PyFirebirdSQL's
                  own event-related code is capable of operating with up to 2147483647
                  events per conduit. However, it has been observed that the Firebird
                  client library experiences catastrophic problems (including memory
@@ -2929,7 +2133,7 @@ Example Program
 ---------------
 
 The following code (a SQL table definition, a SQL trigger definition,
-and two Python programs) demonstrates pyFirebirdSQL-based event
+and two Python programs) demonstrates PyFirebirdSQL-based event
 notification.
 
 The example is based on a database at `'localhost:/temp/test.db'`,
@@ -3049,29 +2253,29 @@ Pitfalls and Limitations
   internal queue even if the Python programmer doesn't call
   :meth:`EventConduit.wait()` to receive the notifications or
   :meth:`EventConduit.flush()` to clear the queue. The ill-informed may
-  misinterpret this behavior as a memory leak in pyFirebirdSQL; it is not.
+  misinterpret this behavior as a memory leak in PyFirebirdSQL; it is not.
 + NEVER use LOCAL-protocol connections in a multithreaded program that
   also uses event handling! The database client library implements the
   local protocol on some platforms in such a way that deadlocks may
   arise in bizarre places if you do this. *This no-LOCAL prohibition is
   not limited to connections that are used as the basis for event
   conduits; it applies to all connections throughout the process.* So
-  why doesn't pyFirebirdSQL protect the Python programmer from this
+  why doesn't PyFirebirdSQL protect the Python programmer from this
   mistake? Because the event handling thread is started by the database
   client library, and it operates beyond the synchronization domain of
-  pyFirebirdSQL at times.
+  PyFirebirdSQL at times.
 
 
 .. note:: The restrictions on the number of active `EventConduit`s in a
    process, and on the number of event names that a single `EventConduit`
-   can listen for, have been removed in pyFirebirdSQL 3.2.
+   can listen for, have been removed in PyFirebirdSQL 3.2.
 
 
 The `database_info` API
 =======================
 
 Firebird provides various informations about server and connected database
-via `database_info` API call. pyFirebirdSQL surfaces this API through next
+via `database_info` API call. PyFirebirdSQL surfaces this API through next
 methods on Connection object:
 
 .. method:: Connection.database_info(request,result_type)
@@ -3146,7 +2350,7 @@ methods on Connection object:
       We are connected to the database at C:\TEMP\TEST.DB on host WEASEL.
 
    As you can see, extracting data with the `database_info` function is
-   rather clumsy. In pyFirebirdSQL 3.2, a higher-level means of accessing
+   rather clumsy. In PyFirebirdSQL 3.2, a higher-level means of accessing
    the same information is available: the :meth:`~Connection.db_info()`
    method. Also, the Services API (accessible to Python programmers via the
    :mod:`firebirdsql.services` module) provides high-level support for
@@ -3263,7 +2467,7 @@ The native Services API, though consistent, is much lower-level than a
 Pythonic API. If the native version were exposed directly,
 accomplishing a given task would probably require more Python code
 than scripting the traditional command-line tools. For this reason,
-pyFirebirdSQL presents its own abstraction over the native API via the
+PyFirebirdSQL presents its own abstraction over the native API via the
 :mod:`firebirdsql.services` module.
 
 Establishing Services API Connections
@@ -3696,7 +2900,7 @@ Database Statistics
 Backup and Restoration
 ----------------------
 
-pyFirebirdSQL offers convenient programmatic control over database
+PyFirebirdSQL offers convenient programmatic control over database
 backup and restoration via the `backup` and `restore` methods.
 
 At the time of this writing, released versions of Firebird/Interbase®
@@ -3705,7 +2909,7 @@ do not implement incremental backup, so we can simplistically define
 of a live database, and *restoration* as the inverse. The
 backup/restoration process exposes numerous parameters, which are
 properly documented in Firebird Documentation to :command:`gbak`.
-The pyFirebirdSQL API to these parameters is presented with minimal
+The PyFirebirdSQL API to these parameters is presented with minimal
 documentation in the sample code below.
 
 .. method:: Connection.backup(sourceDatabase, destFilenames, destFileSizes=(), <options>)
@@ -3761,7 +2965,7 @@ documentation in the sample code below.
    multiple files, which is useful for circumventing operating system
    file size limits or spreading the backup across multiple discs.
 
-   pyFirebirdSQL exposes this facility via the `Connection.backup`
+   PyFirebirdSQL exposes this facility via the `Connection.backup`
    parameters `destFilenames` and `destFileSizes`. `destFilenames` (the
    second positional parameter of `Connection.backup`) can be either a
    string (as in the example above, when creating the backup as a single
@@ -3788,7 +2992,7 @@ documentation in the sample code below.
    excess constituents. However, at the time of this writing, released
    versions of the database engine hang the backup task if more than 11
    constituents are specified (that is, if `len(destFilenames) > 11`).
-   pyFirebirdSQL does not prevent the programmer from submitting more than
+   PyFirebirdSQL does not prevent the programmer from submitting more than
    11 constituents, but it does issue a warning.
 
    The following program directs the engine to split the backup of the
@@ -3857,7 +3061,7 @@ documentation in the sample code below.
    operating system file size limits or spreading the database across
    multiple discs.
 
-   pyFirebirdSQL exposes this facility via the `Connection.restore`
+   PyFirebirdSQL exposes this facility via the `Connection.restore`
    parameters `destFilenames` and `destFilePages`. `destFilenames` (the
    second positional argument of `Connection.restore`) can be either a
    string (as in the example above, when restoring to a single database
@@ -3937,10 +3141,6 @@ Database Operating Modes, Sweeps, and Repair
    Not yet documented.
 
 .. method:: Conenction.setAccessMode(database, mode)
-
-   Not yet documented.
-
-.. method:: Conenction.setSQLDialect(database, dialect)
 
    Not yet documented.
 
