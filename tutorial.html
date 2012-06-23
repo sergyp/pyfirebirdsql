@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick-start Guide / Tutorial &mdash; PyFirebirdSQL 0.6.5 documentation</title>
+    <title>Quick-start Guide / Tutorial &mdash; pyfirebirdsql 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.6.5',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="PyFirebirdSQL 0.6.5 documentation" href="index.html" />
+    <link rel="top" title="pyfirebirdsql 0.7.0 documentation" href="index.html" />
     <link rel="next" title="Python Database API Specification 2.0" href="Python-DB-API-2.0.html" />
-    <link rel="prev" title="PyFirebirdSQL Installation Guide" href="installation.html" /> 
+    <link rel="prev" title="pyfirebirdsql Installation Guide" href="installation.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,9 +40,9 @@
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="PyFirebirdSQL Installation Guide"
+          <a href="installation.html" title="pyfirebirdsql Installation Guide"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,10 +54,10 @@
   <div class="section" id="quick-start-guide-tutorial">
 <h1>Quick-start Guide / Tutorial<a class="headerlink" href="#quick-start-guide-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This brief tutorial aims to get the reader started by demonstrating
-elementary usage of PyFirebirdSQL. It is not a comprehensive Python
+elementary usage of pyfirebirdsql. It is not a comprehensive Python
 Database API tutorial, nor is it comprehensive in its coverage of
 anything else.</p>
-<p>The numerous advanced features of PyFirebirdSQL are covered in another
+<p>The numerous advanced features of pyfirebirdsql are covered in another
 section of this documentation, which is not in a tutorial format, though it
 is replete with examples.</p>
 <div class="section" id="connecting-to-a-database">
@@ -243,7 +243,7 @@ but <em>client-side</em> SQL code (and C API code) must. A result set is
 retrieved from a stored procedure by <cite>SELECT`ing from the procedure,
 whereas output parameters are retrieved with an `EXECUTE PROCEDURE</cite>
 statement.</p>
-<p>To <em>retrieve a result set</em> from a stored procedure with PyFirebirdSQL,
+<p>To <em>retrieve a result set</em> from a stored procedure with pyfirebirdsql,
 use code such as this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select output1, output2 from the_proc(?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">input2</span><span class="p">))</span>
 
@@ -290,7 +290,7 @@ current behavior, however.</p>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="installation.html"
-                        title="previous chapter">PyFirebirdSQL Installation Guide</a></p>
+                        title="previous chapter">pyfirebirdsql Installation Guide</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="Python-DB-API-2.0.html"
                         title="next chapter">Python Database API Specification 2.0</a></p>
@@ -326,9 +326,9 @@ current behavior, however.</p>
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              >next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="PyFirebirdSQL Installation Guide"
+          <a href="installation.html" title="pyfirebirdsql Installation Guide"
              >previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

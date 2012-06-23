@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PyFirebirdSQL Changelog &mdash; PyFirebirdSQL 0.6.5 documentation</title>
+    <title>pyfirebirdsql Changelog &mdash; pyfirebirdsql 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.6.5',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="PyFirebirdSQL 0.6.5 documentation" href="index.html" />
-    <link rel="next" title="PyFirebirdSQL LICENSE" href="license.html" />
-    <link rel="prev" title="PyFirebirdSQL Links" href="links.html" /> 
+    <link rel="top" title="pyfirebirdsql 0.7.0 documentation" href="index.html" />
+    <link rel="next" title="pyfirebirdsql LICENSE" href="license.html" />
+    <link rel="prev" title="pyfirebirdsql Links" href="links.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,12 +37,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="license.html" title="PyFirebirdSQL LICENSE"
+          <a href="license.html" title="pyfirebirdsql LICENSE"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="links.html" title="PyFirebirdSQL Links"
+          <a href="links.html" title="pyfirebirdsql Links"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,11 +52,9 @@
           <div class="body">
             
   <div class="section" id="pyfirebirdsql-changelog">
-<h1>PyFirebirdSQL Changelog<a class="headerlink" href="#pyfirebirdsql-changelog" title="Permalink to this headline">¶</a></h1>
+<h1>pyfirebirdsql Changelog<a class="headerlink" href="#pyfirebirdsql-changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="version-0-6-5">
 <h2>Version 0.6.5<a class="headerlink" href="#version-0-6-5" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="new-features">
-<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <div><ul class="simple">
 <li>callproc() is implemented.</li>
@@ -64,6 +62,25 @@
 </ul>
 </div></blockquote>
 </div>
+<div class="section" id="version-0-6-6">
+<h2>Version 0.6.6<a class="headerlink" href="#version-0-6-6" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>fix issue #28 InternalError after commit</li>
+<li>fix issue #30 Incorrect handling empty row for RowMapping</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="version-0-7-0">
+<h2>Version 0.7.0<a class="headerlink" href="#version-0-7-0" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>change parameter name &#8216;explain_plan&#8217; in class PrepareStatement.__init__().</li>
+<li>issue #32 don&#8217;t decode character set OCTETS</li>
+<li>issue #33 op_allocate_statement do not require a transaction handle.</li>
+<li>add event notification</li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -75,21 +92,20 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PyFirebirdSQL Changelog</a><ul>
-<li><a class="reference internal" href="#version-0-6-5">Version 0.6.5</a><ul>
-<li><a class="reference internal" href="#new-features">New Features</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">pyfirebirdsql Changelog</a><ul>
+<li><a class="reference internal" href="#version-0-6-5">Version 0.6.5</a></li>
+<li><a class="reference internal" href="#version-0-6-6">Version 0.6.6</a></li>
+<li><a class="reference internal" href="#version-0-7-0">Version 0.7.0</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="links.html"
-                        title="previous chapter">PyFirebirdSQL Links</a></p>
+                        title="previous chapter">pyfirebirdsql Links</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="license.html"
-                        title="next chapter">PyFirebirdSQL LICENSE</a></p>
+                        title="next chapter">pyfirebirdsql LICENSE</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="sources/changelog.txt"
@@ -119,12 +135,12 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="license.html" title="PyFirebirdSQL LICENSE"
+          <a href="license.html" title="pyfirebirdsql LICENSE"
              >next</a> |</li>
         <li class="right" >
-          <a href="links.html" title="PyFirebirdSQL Links"
+          <a href="links.html" title="pyfirebirdsql Links"
              >previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

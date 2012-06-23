@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Compliance to Python Database API 2.0 &mdash; PyFirebirdSQL 0.6.5 documentation</title>
+    <title>Compliance to Python Database API 2.0 &mdash; pyfirebirdsql 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.6.5',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="PyFirebirdSQL 0.6.5 documentation" href="index.html" />
+    <link rel="top" title="pyfirebirdsql 0.7.0 documentation" href="index.html" />
     <link rel="next" title="Native Database Engine Features and Extensions Beyond the Python DB API" href="beyond-python-db-api.html" />
     <link rel="prev" title="Python Database API Specification 2.0" href="Python-DB-API-2.0.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,7 @@
 <dl class="data">
 <dt id="firebirdsql.DATETIME">
 <tt class="descclassname">firebirdsql.</tt><tt class="descname">DATETIME</tt><a class="headerlink" href="#firebirdsql.DATETIME" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyFirebirdSQL&#8217;s deferred loading of dynamic type translators causes
+<dd><p>pyfirebirdsql&#8217;s deferred loading of dynamic type translators causes
 this singleton to behave in violation of the standard until the
 <tt class="xref py py-func docutils literal"><span class="pre">firebirdsql.init()</span></tt> function has been called (whether explicitly or
 implicitly). For more information, see the documnation section about
@@ -107,7 +107,7 @@ the database engine only supports fetching a single row at a time.</p>
 </div>
 <div class="section" id="extensions-and-caveats">
 <h2>Extensions and Caveats<a class="headerlink" href="#extensions-and-caveats" title="Permalink to this headline">¶</a></h2>
-<p>PyFirebirdSQL offers a large feature set beyond the minimal requirements
+<p>pyfirebirdsql offers a large feature set beyond the minimal requirements
 of the Python DB API. Most of these extensions are documented in the
 section of this document entitled <cite>Native Database Engine Features and
 Extensions Beyond the Python DB API</cite>.</p>
@@ -138,8 +138,8 @@ to those required by the spec:</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Charset :</th><td class="field-body">For explicitly specifying the character set of the connection.
 See Firebird Documentation for a list of available character sets, and
-<cite>Unicode Fields and PyFirebirdSQL</cite> section for information on handling
-extended character sets with PyFirebirdSQL.</td>
+<cite>Unicode Fields and pyfirebirdsql</cite> section for information on handling
+extended character sets with pyfirebirdsql.</td>
 </tr>
 </tbody>
 </table>
@@ -186,8 +186,8 @@ about <a class="reference external" href="beyond-python-db-api.html#connection-t
 <tt class="descname">charset</tt><a class="headerlink" href="#firebirdsql.Connection.charset" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>(read-only)</em> The character set of the connection (set via the <cite>charset</cite>
 parameter of <a class="reference internal" href="#firebirdsql.connect" title="firebirdsql.connect"><tt class="xref py py-func docutils literal"><span class="pre">firebirdsql.connect()</span></tt></a>). See Firebird Documentation for a list
-of available character sets, and <cite>Unicode Fields and PyFirebirdSQL</cite> section
-for information on handling extended character sets with PyFirebirdSQL.</p>
+of available character sets, and <cite>Unicode Fields and pyfirebirdsql</cite> section
+for information on handling extended character sets with pyfirebirdsql.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -229,7 +229,7 @@ the statement using one of the cursor&#8217;s execute methods.</p>
 <dl class="attribute">
 <dt id="firebirdsql.Connection.precision_mode">
 <tt class="descname">precision_mode</tt><a class="headerlink" href="#firebirdsql.Connection.precision_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Although this attribute is present in PyFirebirdSQL 3.1+ and works in a backward-compatible
+<dd><p>Although this attribute is present in pyfirebirdsql 3.1+ and works in a backward-compatible
 fashion, it is deprecated in favor of the more general dynamic type translation feature.</p>
 </dd></dl>
 
@@ -259,11 +259,11 @@ Advanced Transaction Control: Savepoints section of this document.</p>
 <dd><dl class="attribute">
 <dt id="firebirdsql.Cursor.description">
 <tt class="descname">description</tt><a class="headerlink" href="#firebirdsql.Cursor.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyFirebirdSQL makes absolutely no guarantees about <cite>description</cite> except those
+<dd><p>pyfirebirdsql makes absolutely no guarantees about <cite>description</cite> except those
 required by the Python Database API Specification 2.0 (that is, <cite>description</cite>
 is either <cite>None</cite> or a sequence of 7-element sequences). Therefore, client
 programmers should <em>not</em> rely on <cite>description</cite> being an instance of a particular
-class or type. PyFirebirdSQL provides several named positional constants to be
+class or type. pyfirebirdsql provides several named positional constants to be
 used as indices into a given element of <cite>description</cite> . The contents
 of all <cite>description</cite> elements are defined by the DB API spec; these
 constants are provided merely for convenience.</p>
@@ -288,7 +288,7 @@ the <a class="reference external" href="Python-DB-API-2.0.html">DB API Specifica
 <dl class="attribute">
 <dt id="firebirdsql.Cursor.rowcount">
 <tt class="descname">rowcount</tt><a class="headerlink" href="#firebirdsql.Cursor.rowcount" title="Permalink to this definition">¶</a></dt>
-<dd><p>Although PyFirebirdSQL&#8217;s <cite>Cursor`s implement this
+<dd><p>Although pyfirebirdsql&#8217;s <cite>Cursor`s implement this
 attribute, the database engine&#8217;s own support for the determination of
 &#8220;rows affected&#8221;/&#8221;rows selected&#8221; is quirky. The database engine only
 supports the determination of rowcount for `INSERT</cite>, <cite>UPDATE</cite>,
@@ -320,9 +320,9 @@ determinable by the interface&#8221;.</p>
 <dl class="method">
 <dt id="firebirdsql.Cursor.fetchall">
 <tt class="descname">fetchall</tt><big>(</big><big>)</big><a class="headerlink" href="#firebirdsql.Cursor.fetchall" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyFirebirdSQL makes absolutely no guarantees about
+<dd><p>pyfirebirdsql makes absolutely no guarantees about
 the return value of the <cite>fetchone</cite> / <cite>fetchmany</cite> / <cite>fetchall</cite> methods
-except that it is a sequence indexed by field position. PyFirebirdSQL
+except that it is a sequence indexed by field position. pyfirebirdsql
 makes absolutely no guarantees about the return value of the
 <cite>fetchonemap</cite> / <cite>fetchmanymap</cite> / <cite>fetchallmap</cite> methods (documented
 below) except that it is a mapping of field name to field value.
@@ -432,7 +432,7 @@ return iterators rather than materialized sequences. <cite>iter</cite> and
         <li class="right" >
           <a href="Python-DB-API-2.0.html" title="Python Database API Specification 2.0"
              >previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

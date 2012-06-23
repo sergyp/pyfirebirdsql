@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PyFirebirdSQL Installation Guide &mdash; PyFirebirdSQL 0.6.5 documentation</title>
+    <title>pyfirebirdsql Installation Guide &mdash; pyfirebirdsql 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.6.5',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="PyFirebirdSQL 0.6.5 documentation" href="index.html" />
+    <link rel="top" title="pyfirebirdsql 0.7.0 documentation" href="index.html" />
     <link rel="next" title="Quick-start Guide / Tutorial" href="tutorial.html" />
-    <link rel="prev" title="Welcome to PyFirebirdSQL’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to pyfirebirdsql’s documentation!" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,9 +40,9 @@
           <a href="tutorial.html" title="Quick-start Guide / Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to PyFirebirdSQL’s documentation!"
+          <a href="index.html" title="Welcome to pyfirebirdsql’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,17 +52,17 @@
           <div class="body">
             
   <div class="section" id="pyfirebirdsql-installation-guide">
-<h1>PyFirebirdSQL Installation Guide<a class="headerlink" href="#pyfirebirdsql-installation-guide" title="Permalink to this headline">¶</a></h1>
+<h1>pyfirebirdsql Installation Guide<a class="headerlink" href="#pyfirebirdsql-installation-guide" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>PyFirebirdSQL requires a valid combination of the dependencies in
+<p>pyfirebirdsql requires a valid combination of the dependencies in
 the list below.</p>
 <p>Detailed instructions on how to install each dependency are beyond the
 scope of this document; consult the dependency distributor for
 installation instructions.</p>
 <p>Satisfying the dependencies is not difficult! For mainstream
 operating systems &#8211; including Windows and Linux &#8211; easily installable
-binary distributions are available for <em>all</em> of PyFirebirdSQL&#8217;s
+binary distributions are available for <em>all</em> of pyfirebirdsql&#8217;s
 dependencies (see the download links below).</p>
 <ol class="arabic">
 <li><p class="first">Operating System - one of:</p>
@@ -86,7 +86,7 @@ installation [<a class="reference external" href="http://sourceforge.net/project
 <p>The source distribution will <em>probably</em> also install (and function) on most
 other POSIX-compliant Unix variants, as long as all of the <a class="reference internal" href="#dependencies">dependencies</a>
 are also installed and functional.</p>
-<p>Because the PyFirebirdSQL source distribution supports the standard
+<p>Because the pyfirebirdsql source distribution supports the standard
 Python package installation facility (<a class="reference external" href="http://www.python.org/sigs/distutils-sig/">distutils</a>), installing the source
 distribution on a typical Linux system is downright easy.</p>
 </div>
@@ -94,7 +94,7 @@ distribution on a typical Linux system is downright easy.</p>
 <div class="section" id="installation-from-source-distribution">
 <span id="source-distribution"></span><h2>Installation from source distribution<a class="headerlink" href="#installation-from-source-distribution" title="Permalink to this headline">¶</a></h2>
 <p>Shortcut for the Experienced and Impatient:</p>
-<div class="highlight-python"><pre>(decompress PyFirebirdSQL into *temp_dir*)
+<div class="highlight-python"><pre>(decompress pyfirebirdsql into *temp_dir*)
 cd *temp_dir*
 python setup.py build
 python setup.py install
@@ -103,8 +103,8 @@ python -c "import firebirdsql"
 </div>
 <p>Then hit the <a class="reference external" href="usage.html">Usage Guide</a>.</p>
 <div class="section" id="install-pyfirebirdsql">
-<h3>Install PyFirebirdSQL<a class="headerlink" href="#install-pyfirebirdsql" title="Permalink to this headline">¶</a></h3>
-<p>During this step, the setup script moves the PyFirebirdSQL package
+<h3>Install pyfirebirdsql<a class="headerlink" href="#install-pyfirebirdsql" title="Permalink to this headline">¶</a></h3>
+<p>During this step, the setup script moves the pyfirebirdsql package
 (including the newly compiled C extensions) to the standard package
 directory of your Python installation so that Python will be able to
 <strong class="command">import firebirdsql</strong> and <strong class="command">import firebirdsql.services</strong></p>
@@ -116,7 +116,7 @@ directory or a different directory from the files used by the Python
 interpreter.</p>
 <p>Run the following command:
 <strong class="command">python setup.py install</strong></p>
-<p>The setup script will install PyFirebirdSQL, listing each file it
+<p>The setup script will install pyfirebirdsql, listing each file it
 installs.</p>
 <p>Errors during this step are rare because compilation (the finicky part
 of this process) has already taken place; installation is really just
@@ -138,21 +138,21 @@ rather than the Python interpreter anyway.</li>
 </div>
 </div>
 <div class="section" id="test-your-pyfirebirdsql-installation">
-<h2>Test your PyFirebirdSQL installation<a class="headerlink" href="#test-your-pyfirebirdsql-installation" title="Permalink to this headline">¶</a></h2>
-<p>PyFirebirdSQL has an extensive test suite, but it is not really intended for
+<h2>Test your pyfirebirdsql installation<a class="headerlink" href="#test-your-pyfirebirdsql-installation" title="Permalink to this headline">¶</a></h2>
+<p>pyfirebirdsql has an extensive test suite, but it is not really intended for
 routine public use.</p>
-<p>To verify that PyFirebirdSQL is installed properly, switch to a
+<p>To verify that pyfirebirdsql is installed properly, switch to a
 directory <em>other than the temporary directory into which you
 decompressed the source distribution</em> (to avoid conflict between the
 copy of firebirdsql in that directory and the copy placed under the
 standard Python <cite>site-packages</cite> directory), then verify the
-importability of your PyFirebirdSQL installation by issuing the
+importability of your pyfirebirdsql installation by issuing the
 following command:</p>
 <div class="highlight-python"><pre>python -c "import firebirdsql as fb; print fb.__version__"</pre>
 </div>
 <p>If the import attempt does not encounter any errors and the version
 number is what you expected, you are finished. Next, consider reading
-the PyFirebirdSQL Usage Guide.</p>
+the pyfirebirdsql Usage Guide.</p>
 <p>You should not encounter any errors at this stage since you have
 already completed the compilation and installation steps successfully.
 If you do, please report them to the <a class="reference external" href="http://tech.groups.yahoo.com/group/firebird-python/">firebird-python  support list</a>.</p>
@@ -167,23 +167,23 @@ If you do, please report them to the <a class="reference external" href="http://
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PyFirebirdSQL Installation Guide</a><ul>
+<li><a class="reference internal" href="#">pyfirebirdsql Installation Guide</a><ul>
 <li><a class="reference internal" href="#dependencies">Dependencies</a><ul>
 <li><a class="reference internal" href="#linux-and-other-unix-variants">Linux and Other Unix Variants</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#installation-from-source-distribution">Installation from source distribution</a><ul>
-<li><a class="reference internal" href="#install-pyfirebirdsql">Install PyFirebirdSQL</a></li>
+<li><a class="reference internal" href="#install-pyfirebirdsql">Install pyfirebirdsql</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#test-your-pyfirebirdsql-installation">Test your PyFirebirdSQL installation</a></li>
+<li><a class="reference internal" href="#test-your-pyfirebirdsql-installation">Test your pyfirebirdsql installation</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to PyFirebirdSQL&#8217;s documentation!</a></p>
+                        title="previous chapter">Welcome to pyfirebirdsql&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="tutorial.html"
                         title="next chapter">Quick-start Guide / Tutorial</a></p>
@@ -219,9 +219,9 @@ If you do, please report them to the <a class="reference external" href="http://
           <a href="tutorial.html" title="Quick-start Guide / Tutorial"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to PyFirebirdSQL’s documentation!"
+          <a href="index.html" title="Welcome to pyfirebirdsql’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">PyFirebirdSQL 0.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyfirebirdsql 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
