@@ -131,55 +131,6 @@ def recv_channel(sock, nbytes, timeout=None, word_alignment=False):
 def send_channel(sock, b):
     sock.send(b)
 
-def params_to_blr(params):
-    "Convert parameter array to BLR and values format."
-    ln = len(params) * 2
-    blr = bytes([5, 2, 4, 0, ln & 255, ln >> 8])
-    values = bytes([])
-    for p in params:
-        t = type(p)
-        if ((PYTHON_MAJOR_VER == 2 and t == str) or
-            (PYTHON_MAJOR_VER == 3 and t == bytes)):
-            v = p
-            nbytes = len(v)
-            pad_length = ((4-nbytes) & 3)
-            v += bytes([0]) * pad_length
-            blr += bytes([14, nbytes & 255, nbytes >> 8])
-        elif t == int:
-            v = bint_to_bytes(p, 4)
-            blr += bytes([7, 0])
-        elif t == decimal.Decimal or t == float:
-            if t == float:
-                p = decimal.Decimal(str(p))
-            (sign, digits, exponent) = p.as_tuple()
-            v = 0
-            ln = len(digits)
-            for i in range(ln):
-                v += digits[i] * (10 ** (ln -i-1))
-            if sign:
-                v *= -1
-            v = bint_to_bytes(v, 8)
-            if exponent < 0:
-                exponent += 256
-            blr += bytes([16, exponent])
-        elif t == datetime.date:
-            v = convert_date(p)
-            blr += bytes([12])
-        elif t == datetime.time:
-            v = convert_time(p)
-            blr += bytes([13])
-        elif t == datetime.datetime:
-            v = convert_timestamp(p)
-            blr += bytes([35])
-        elif p == None:
-            v = bytes([0]) * 8
-            blr += bytes([9, 0])
-        values += v
-        blr += bytes([7, 0])
-        values += bytes([0]) * 4 if p != None else bytes([0xff,0xff,0x34,0x8c])
-    blr += bytes([255, 76])    # [blr_end, blr_eoc]
-    return blr, values
-
 
 class WireProtocol:
     buffer_length = 1024
@@ -273,6 +224,60 @@ class WireProtocol:
     'KOI8-U'              :   'koi8_u', # (Firebird 2.0+)
     'WIN1258'             :   'cp1258', # (Firebird 2.0+)
     }
+
+    def params_to_blr(self, params):
+        "Convert parameter array to BLR and values format."
+        ln = len(params) * 2
+        blr = bytes([5, 2, 4, 0, ln & 255, ln >> 8])
+        values = bytes([])
+        for p in params:
+            t = type(p)
+            if (PYTHON_MAJOR_VER == 2 and t in (unicode, str)):
+                v = self.str_to_bytes(p) if t == unicode else p
+                nbytes = len(v)
+                pad_length = ((4-nbytes) & 3)
+                v += bytes([0]) * pad_length
+                blr += bytes([14, nbytes & 255, nbytes >> 8])
+            elif (PYTHON_MAJOR_VER == 3 and t == bytes):
+                v = p
+                nbytes = len(v)
+                pad_length = ((4-nbytes) & 3)
+                v += bytes([0]) * pad_length
+                blr += bytes([14, nbytes & 255, nbytes >> 8])
+            elif t == int:
+                v = bint_to_bytes(p, 4)
+                blr += bytes([7, 0])
+            elif t == decimal.Decimal or t == float:
+                if t == float:
+                    p = decimal.Decimal(str(p))
+                (sign, digits, exponent) = p.as_tuple()
+                v = 0
+                ln = len(digits)
+                for i in range(ln):
+                    v += digits[i] * (10 ** (ln -i-1))
+                if sign:
+                    v *= -1
+                v = bint_to_bytes(v, 8)
+                if exponent < 0:
+                    exponent += 256
+                blr += bytes([16, exponent])
+            elif t == datetime.date:
+                v = convert_date(p)
+                blr += bytes([12])
+            elif t == datetime.time:
+                v = convert_time(p)
+                blr += bytes([13])
+            elif t == datetime.datetime:
+                v = convert_timestamp(p)
+                blr += bytes([35])
+            elif p == None:
+                v = bytes([0]) * 8
+                blr += bytes([9, 0])
+            values += v
+            blr += bytes([7, 0])
+            values += bytes([0]) * 4 if p != None else bytes([0xff,0xff,0x34,0x8c])
+        blr += bytes([255, 76])    # [blr_end, blr_eoc]
+        return blr, values
 
     def str_to_bytes(self, s):
         return s.encode(self.charset_map.get(self.charset, self.charset))
@@ -570,7 +575,7 @@ class WireProtocol:
             p.pack_int(0)
             send_channel(self.sock, p.get_buffer())
         else:
-            (blr, values) = params_to_blr(params)
+            (blr, values) = self.params_to_blr(params)
             p.pack_bytes(blr)
             p.pack_int(0)
             p.pack_int(1)
@@ -589,7 +594,7 @@ class WireProtocol:
             p.pack_int(0)
             send_channel(self.sock, p.get_buffer())
         else:
-            (blr, values) = params_to_blr(params)
+            (blr, values) = self.params_to_blr(params)
             p.pack_bytes(blr)
             p.pack_int(0)
             p.pack_int(1)
@@ -614,7 +619,7 @@ class WireProtocol:
             r += bint_to_bytes(0, 2)    # in_blr len
             values = bytes([])
         else:
-            (blr, values) = params_to_blr(params)
+            (blr, values) = self.params_to_blr(params)
             r += bint_to_bytes(len(blr), 2) + blr
         r += bint_to_bytes(len(in_msg), 2) + in_msg
         r += bint_to_bytes(0, 2)    # unknown short int 0

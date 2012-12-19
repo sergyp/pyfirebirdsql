@@ -403,7 +403,7 @@ class Cursor:
     def _convert_params(self, params):
         cooked_params = []
         for param in params:        # Convert str/bytes parameter to blob id
-            if type(param) == str:
+            if type(param) == unicode: # todo: need to fix for python3 strings
                 param = self.transaction.connection.str_to_bytes(param)
             cooked_params.append(param)
             continue
