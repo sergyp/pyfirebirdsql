@@ -231,14 +231,17 @@ class WireProtocol:
         blr = bytes([5, 2, 4, 0, ln & 255, ln >> 8])
         values = bytes([])
         for p in params:
+            if (
+                PYTHON_MAJOR_VER == 2 and isinstance(p, unicode) or
+                PYTHON_MAJOR_VER == 3 and isinstance(o, str)
+            ):
+                p = self.str_to_bytes(p)
+
             t = type(p)
-            if (PYTHON_MAJOR_VER == 2 and t in (unicode, str)):
-                v = self.str_to_bytes(p) if t == unicode else p
-                nbytes = len(v)
-                pad_length = ((4-nbytes) & 3)
-                v += bytes([0]) * pad_length
-                blr += bytes([14, nbytes & 255, nbytes >> 8])
-            elif (PYTHON_MAJOR_VER == 3 and t == bytes):
+            if (
+                PYTHON_MAJOR_VER == 2 and issubclass(t, str) or
+                PYTHON_MAJOR_VER == 3 and issubclass(t, bytes)
+            ):
                 v = p
                 nbytes = len(v)
                 pad_length = ((4-nbytes) & 3)
